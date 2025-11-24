@@ -115,6 +115,7 @@ model_arch_config.Expv7_datafuseFeat = dcopy(model_arch_config.Expv7)
 model_arch_config.Expv7_datafuseFeat_large = dcopy(model_arch_config.Expv7)
 model_arch_config.Expv7_datafuseFeat_onlyEvents = dcopy(model_arch_config.Expv7)
 model_arch_config.Expv7_datafuseFeat_direct = dcopy(model_arch_config.Expv7)
+
 model_arch_config.Expv8 = dcopy(model_arch_config.Expv7)
 model_arch_config.Expv8_Light = dcopy(model_arch_config.Expv7)
 model_arch_config.Expv8_Lights2 = dcopy(model_arch_config.Expv7)
@@ -123,7 +124,7 @@ model_arch_config.Expv8_Lights2.val_config_dataloader = 'loader_ERFNetv0Mix'
 model_arch_config.Expv8_Lights2.define_model.num_decoder = 8
 
 model_arch_config.Expv8_large = dcopy(model_arch_config.Expv7)
-model_arch_config.Expv8_large.define_model.num_decoder = 8
+model_arch_config.Expv8_large.define_model.num_decoder = 8 # 即论文里的 step size N
 model_arch_config.Expv8_large.train_config_dataloader = 'loader_ERFNetv0Mix'
 model_arch_config.Expv8_large.val_config_dataloader = 'loader_ERFNetv0Mix'
 

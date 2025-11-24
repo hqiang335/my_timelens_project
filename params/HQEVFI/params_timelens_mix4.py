@@ -3,7 +3,7 @@ from tools import parse_path_common
 import os
 from params.models import model_arch_config
 from tools.registery import PARAM_REGISTRY
-from params.Paths.RealCaptured import hostname
+# from params.Paths.RealCaptured import hostname
 from params.Paths.RealCaptured import RC
 # from params.Paths import GOPRO
 
@@ -53,9 +53,9 @@ def timelens_RC_smallmix_lpipsx4(args):
 
     training_config = ED()
     training_config.dataloader = 'loader_RC_timelens_smallmix'
-    training_config.crop_size = 256 if hostname == 'server' else 96
-    training_config.num_workers = 16 if hostname == 'server' else 1
-    training_config.batch_size = 4 if hostname == 'server' else 2
+    training_config.crop_size = 256 #if hostname == 'server' else 96
+    training_config.num_workers = 16 #if hostname == 'server' else 1
+    training_config.batch_size = 4 #if hostname == 'server' else 2
     if not args.calc_flops and not args.skip_training:
         training_config.data_paths = parse_path_common(paths.train_rgb, paths.train_evs, RC=True)
     training_config.data_index_offset = 0

@@ -1,5 +1,5 @@
 from easydict import EasyDict as ED
-from params.Paths import CBMNet
+# from params.Paths import CBMNet
 from tools import parse_path_common
 import os
 from params.models import model_arch_config

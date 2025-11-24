@@ -7,6 +7,7 @@ except:
     pass
 
 
+
 def parse_path(folder, fdepth):
     file_dict = {}
     if fdepth == 1:
@@ -60,16 +61,46 @@ def parse_path_common(folder0, folder1, fdepth=2, cbmnet=False, hsergb=False, bs
                 })
             except:
                 pass
-    elif RC:
+    # elif RC:
+    #     subfolders = os.listdir(folder0)
+    #     for sf in natsorted(subfolders):
+    #         print('!!!!!!!!!!!!!!!!!!!!!!!!!!!',sf)
+    #         evs_keyword = 'RGB-EVS' if sf not in EVSneg3 else 'RGB-EVS_EVSneg3ms'
+    #         offset = 1 if sf in EVSneg3 else 0
+    #         evs_len = len(os.listdir(os.path.join(folder0, sf, evs_keyword)))
+    #         file_dict.update({
+    #             sf: [[os.path.join(folder0, sf, 'visual_RGB', pi) for pi in natsorted(os.listdir(os.path.join(folder0, sf, 'visual_RGB')))[offset:evs_len]],
+    #                  [os.path.join(folder0, sf, evs_keyword, pi) for pi in natsorted(os.listdir(os.path.join(folder0, sf, evs_keyword)))]]
+    #         })
+
+    elif RC: #改版，因为实际目录有点小复杂
+        real_prefix = "ailab/group/pjlab-sail/mayongrui/dataset/realcaptured_beifen/hand/data"
+
         subfolders = os.listdir(folder0)
         for sf in natsorted(subfolders):
+
             evs_keyword = 'RGB-EVS' if sf not in EVSneg3 else 'RGB-EVS_EVSneg3ms'
             offset = 1 if sf in EVSneg3 else 0
-            evs_len = len(os.listdir(os.path.join(folder0, sf, evs_keyword)))
+
+            # Real path because your dataset is nested very deeply
+            rgb_evs_path = os.path.join(folder0, sf, real_prefix, sf, evs_keyword)
+            visual_rgb_path = os.path.join(folder0, sf, real_prefix, sf, "visual_RGB")
+
+            evs_len = len(os.listdir(rgb_evs_path))
+
             file_dict.update({
-                sf: [[os.path.join(folder0, sf, 'visual_RGB', pi) for pi in natsorted(os.listdir(os.path.join(folder0, sf, 'visual_RGB')))[offset:evs_len]],
-                     [os.path.join(folder0, sf, evs_keyword, pi) for pi in natsorted(os.listdir(os.path.join(folder0, sf, evs_keyword)))]]
+                sf: [
+                    [
+                        os.path.join(visual_rgb_path, pi)
+                        for pi in natsorted(os.listdir(visual_rgb_path))[offset:evs_len]
+                    ],
+                    [
+                        os.path.join(rgb_evs_path, pi)
+                        for pi in natsorted(os.listdir(rgb_evs_path))
+                    ]
+                ]
             })
+
     else:
         if fdepth == 1:
             folder0_item = len(os.listdir(folder0))
