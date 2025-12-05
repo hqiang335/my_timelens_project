@@ -37,13 +37,13 @@ def main():
     for cepoch in range(epoch, params.training_config.max_epoch+1):
         model._update_training_time()
         if params.enable_training:
-            # st = time.time()
+            st = time.time()
             for step, data in enumerate(trainLoader):
-               #print(step, time.time()-st)
+               print(step, time.time()-st)
                model.net_training(data, optimizer, cepoch, step)
                if scheduler is not None and scheduler_type == 'step':
                    scheduler.step()
-               # st = time.time()
+               st = time.time()
             if scheduler is not None and scheduler_type == 'epoch':
                 scheduler.step()
             log_cont = model._print_train_log(cepoch)

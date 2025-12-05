@@ -13,3 +13,4 @@ from models.Expv8_Lights3.runExpv8_Lights3 import Expv8_Lights3
 
 # from models.CBMNet.runmycbmnet import myCBMNet
 # from models.RGBGT.runRGBGT import RGBGT
+from models.Expv8_large.runExpv8_large_for_inference import Expv8_large_infer 

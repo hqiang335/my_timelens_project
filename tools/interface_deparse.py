@@ -8,10 +8,10 @@ import os
 
 def keyword_parse():
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument("--param_name", type=str, default="traintest_RC_smallmix_lpips", help="model saving path")
-    parser.add_argument("--model_name", type=str, default="Expv8_large", help="model name")
+    parser.add_argument("--param_name", type=str, default="trainGOPROVFI", help="model saving path")
+    parser.add_argument("--model_name", type=str, default="E_TRFNetv0", help="model name")
     parser.add_argument("--seed", type=int, default=1226, help="random seed")
-    parser.add_argument("--model_pretrained", type=str, default='./weights/Expv8_large_HQEVFI.pt', help="model saving name")
+    parser.add_argument("--model_pretrained", type=str, default=None, help="model saving name")
     parser.add_argument("--init_step", type=int, default=None, help="initialize training steps")
     parser.add_argument("--skip_training", action="store_true", help="Whether or not enable training")
     parser.add_argument("--clear_previous", action="store_true", help="Delete previous results")

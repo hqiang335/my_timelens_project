@@ -8,7 +8,7 @@ from torch.nn import functional as F
 
 
 @MODEL_REGISTRY.register()
-class Expv8_large(BaseModel):
+class Expv8_large_infer(BaseModel):
     def __init__(self, params):
         super().__init__(params)
         self.net = define_network(params.model_config.define_model)
@@ -18,7 +18,14 @@ class Expv8_large(BaseModel):
 
         # === 添加推理专用属性 ===
         self.interp_ratio = params.interp_ratio  # 保存插值比例
-
+        
+    def metrics_init(self):
+        """
+        覆盖 BaseModel.metrics_init，推理模式下不构建任何度量/损失。
+        这样就不会访问 params.validation_config.losses。
+        """
+        self.train_metrics = {}
+        self.val_metrics = {}
 
     def net_validation(self, data_in, epoch):
         self.eval() # 设置为评估模式

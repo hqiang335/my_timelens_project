@@ -62,8 +62,8 @@ class MixLoader(Dataset):
         self.split_training_and_evaluation()
         self.toim = ToPILImage()
         self.totensor = ToTensor()
-        self.interp_ratio_list = [4, 8, 16, 32] if training else [para[self.key]['interp_ratio']]
-        self.interp_list_pob = [0.15, 0.25, 0.5, 0.1] if training else [1]
+        self.interp_ratio_list = [2, 4] if training else [para[self.key]['interp_ratio']]
+        self.interp_list_pob = [0.5,0.5] if training else [1]
         for irl in self.interp_ratio_list:
             self.samples_dict.update({
                 str(irl):[]

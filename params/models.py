@@ -78,7 +78,7 @@ model_arch_config.Expv2_REFID_decoder_asInit.define_model.type = 'BidirectionalW
 
 
 model_arch_config.Expv2_REFID_FB = dcopy(model_arch_config.Expv2_REFID_flowdecoder)
-# model_arch_config.Expv2
+# model_arch_config.Expv2 ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
 model_arch_config.Expv2_REFID_FB_withencoderrefine = dcopy(model_arch_config.Expv2_REFID_flowdecoder)
 model_arch_config.Expv2_REFID_flowdecoder_withrefine = dcopy(model_arch_config.Expv2_REFID_flowdecoder)
 model_arch_config.Expv2_REFID_FBfwarp = dcopy(model_arch_config.Expv2_REFID_flowdecoder)
@@ -122,11 +122,26 @@ model_arch_config.Expv8_Lights2 = dcopy(model_arch_config.Expv7)
 model_arch_config.Expv8_Lights2.train_config_dataloader = 'loader_ERFNetv0Mix'
 model_arch_config.Expv8_Lights2.val_config_dataloader = 'loader_ERFNetv0Mix'
 model_arch_config.Expv8_Lights2.define_model.num_decoder = 8
-
 model_arch_config.Expv8_large = dcopy(model_arch_config.Expv7)
 model_arch_config.Expv8_large.define_model.num_decoder = 8 # 即论文里的 step size N
+
+# ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+model_arch_config.Expv8_large.define_model.use_unet_refiner = True
+# model_arch_config.Expv8_large.define_model.echannel = 16 
+model_arch_config.Expv8_large_infer = dcopy(model_arch_config.Expv8_large)
+# ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+
 model_arch_config.Expv8_large.train_config_dataloader = 'loader_ERFNetv0Mix'
 model_arch_config.Expv8_large.val_config_dataloader = 'loader_ERFNetv0Mix'
+
+
+
+#x4_e16
+# model_arch_config.refinex4e16 = dcopy(model_arch_config.Expv8_large)
+# model_arch_config.refinex4e16.define_model.num_decoder = 8  # 即论文里的 step size N
+# model_arch_config.refinex4e16.define_model.echannel = 16    # ✅ 事件通道改为 16
+
+
 
 model_arch_config.Expv8_Lights2fieldflow = dcopy(model_arch_config.Expv8_Lights2)
 

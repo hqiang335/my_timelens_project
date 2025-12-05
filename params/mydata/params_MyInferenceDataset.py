@@ -4,7 +4,7 @@ from tools import parse_path_common
 import os
 from params.models import model_arch_config
 from tools.registery import PARAM_REGISTRY
-from params.Paths.mydata import hostname
+# from params.Paths.mydata import hostname
 
 mkdir = lambda x:os.makedirs(x, exist_ok=True)
 
@@ -12,19 +12,22 @@ mkdir = lambda x:os.makedirs(x, exist_ok=True)
 def MyInferenceDataset(args):
     paths = ED()
     paths.train_rgb = mydata.train.dense_rgb
-    paths.train_evs = mydata.train.evs_refid if hostname != 'local' else mydata.train.evs
+    # paths.train_evs = mydata.train.evs_refid if hostname != 'local' else mydata.train.evs
+    paths.train_evs = mydata.train.evs_refid 
+
     # paths.train_path_dict = parse_path_common(paths.train_rgb, paths.train_evs)
     # Interpolation ratio to generate events
     # paths.train_rgb_skip = 8
     paths.test_rgb = mydata.test.dense_rgb
-    paths.test_evs = mydata.test.evs_refid if hostname != 'local' else mydata.test.evs
+    # paths.test_evs = mydata.test.evs_refid if hostname != 'local' else mydata.test.evs
+    paths.test_evs = mydata.test.evs_refid 
     # paths.test_path_dict = parse_path_common(paths.test_rgb, paths.test_evs)
     # Interpolation ratio to generate events
     # paths.test_rgb_skip = 8
 
     paths.save = ED()
     paths.save.save_path = './RGB_MyInferenceDataset'
-    paths.save.exp_path = os.path.join(paths.save.save_path, 'MyInferenceDataset'+f"_{args.model_name}_16" + f"{args.extension}")
+    paths.save.exp_path = os.path.join(paths.save.save_path, 'MyInferenceDataset'+f"_{args.model_name}" + f"{args.extension}")
     paths.save.record_txt = os.path.join(paths.save.exp_path, 'training_record.txt')
     paths.save.train_im_path = os.path.join(paths.save.exp_path, 'trainining_Visual_Examples')
     paths.save.val_im_path = os.path.join(paths.save.exp_path, 'Validation_Visual_Examples')
@@ -52,14 +55,15 @@ def MyInferenceDataset(args):
     training_config = ED()
     training_config.dataloader = '' if 'train_config_dataloader' not in model_config.keys() else model_config[
         'train_config_dataloader']
-    training_config.crop_size = 256 if hostname == 'server' else 96
-    training_config.num_workers = 16 if hostname == 'server' else 4
-    training_config.batch_size = 1 if hostname == 'server' else 1
+
+    training_config.crop_size = 256 
+    training_config.num_workers = 16 
+    training_config.batch_size = 1 
     if not args.calc_flops and not args.skip_training:
         training_config.data_paths = parse_path_common(paths.train_rgb, paths.train_evs)
     training_config.data_index_offset = 1
     training_config.rgb_sampling_ratio = 8
-    training_config.interp_ratio = 16
+    training_config.interp_ratio = 4
     # training_config.sample_group = 3
     training_config.random_t = False
     training_config.color = 'RGB'
@@ -82,7 +86,7 @@ def MyInferenceDataset(args):
     # training_config.lr = 1e-4
     # training_config.optim.scheduler_lr_gamma = 0.5
     # training_config.optim.scheduler_lr_milestone = [25, 50, 75]
-    training_config.max_epoch = 10
+    training_config.max_epoch = 25 #改了
 
     training_config.losses = ED()
     training_config.losses.Charbonier = ED()
@@ -118,9 +122,12 @@ def MyInferenceDataset(args):
     #     validation_config.data_paths = parse_path_common(paths.test_rgb, paths.test_evs)
     validation_config.data_index_offset = 1
     validation_config.rgb_sampling_ratio = 8
-    validation_config.interp_ratio = 16
+    validation_config.interp_ratio = 4
     validation_config.random_t = False
     validation_config.color = 'RGB'
+
+    #防止报错 新加12.4
+    validation_config.losses = ED()
 
     # validation_config.losses = ED()
     # validation_config.losses.l1_loss = ED()
@@ -153,5 +160,5 @@ def MyInferenceDataset(args):
     params.events_channel = 128
     params.enable_training = False  # 禁用训练
     params.inference_only = True    # 推理模式
-    params.interp_ratio = 16        # 全局插值率    
+    params.interp_ratio = 4        # 全局插值率    
     return params

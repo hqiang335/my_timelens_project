@@ -9,14 +9,14 @@ from tools.registery import DATASET_REGISTRY
 from numba import jit
 
 # 事件相机的目标分辨率
-H_EVT, W_EVT = 816, 612
+H_EVT, W_EVT = 612, 816
 
 @jit(nopython=True)
 def events_to_voxel_grid_xyttp(
     events_xyttp: np.ndarray,
     H: int = H_EVT,
     W: int = W_EVT,
-    bins: int = 128,
+    bins: int = 16,
 ) -> np.ndarray:
     """
     将单个帧间隔内的 [x,y,t,p] 事件列表转换为体素网格 [bins, H, W]
@@ -135,7 +135,7 @@ class loader_MyInferenceDataset(Dataset):
         
         # 从 params 中获取其他配置
         self.interp_ratio = int(params.interp_ratio)
-        self.events_bins = int(params.events_bins) if hasattr(params, 'events_bins') else 128
+        self.events_bins = int(params.events_channel)
         self.scene = params.scene_name if hasattr(params, 'scene_name') else self.aps_dir.parent.name
         
         # 加载APS帧文件
@@ -144,8 +144,8 @@ class loader_MyInferenceDataset(Dataset):
 
         # 构建帧名 -> 事件文件路径的映射
         self.ev_map: Dict[str, Path] = {}
-        for p in sorted(self.ev_dir.glob("*_events.npy")):
-            stem = p.stem[:-7] if p.stem.endswith("_events") else p.stem
+        for p in sorted(self.ev_dir.glob("*.npy")):
+            stem = p.stem
             self.ev_map[stem] = p
 
         # 构建有效索引
@@ -189,8 +189,8 @@ class loader_MyInferenceDataset(Dataset):
             "im1": im1,                # [C,H,W]
             "events": events,          # [Ce,H,W]
             "gts": torch.empty(0),     # 推理时无真值
-            "rgb_name": [[f0.name], [f1.name]],  # 改为列表的列表
-            "folder": [self.scene],    # 改为单元素列表
+            "rgb_name": [f0.name, f1.name],  # 改为列表的列表
+            "folder": self.scene,    # 改为单元素列表
             "interp_ratio": self.interp_ratio,  # 添加插值比例
         }
         return sample

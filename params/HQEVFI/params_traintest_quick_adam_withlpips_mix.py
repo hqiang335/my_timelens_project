@@ -20,7 +20,7 @@ def traintest_RC_smallmix_lpips(args):
 
     paths.save = ED()
     paths.save.save_path = './RGB_resOut_HQEVFI'
-    paths.save.exp_path = os.path.join(paths.save.save_path, f"mix_{args.model_name}x16" + f"_adamLPIPS{args.extension}")
+    paths.save.exp_path = os.path.join(paths.save.save_path, f"{args.model_name}" + f"{args.extension}")
     paths.save.record_txt = os.path.join(paths.save.exp_path, 'training_record.txt')
     paths.save.train_im_path = os.path.join(paths.save.exp_path, 'trainining_Visual_Examples')
     paths.save.val_im_path = os.path.join(paths.save.exp_path, 'Validation_Visual_Examples')
@@ -46,15 +46,15 @@ def traintest_RC_smallmix_lpips(args):
     # model_config.define_model = cur_model_arch_config
 
     training_config = ED()
-    training_config.dataloader = 'mix_loader_smallRC'
+    training_config.dataloader = 'mix_loader_smallRC' #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     training_config.crop_size = 256
-    training_config.num_workers = 16
-    training_config.batch_size = 1
+    training_config.num_workers = 8
+    training_config.batch_size = 1 #混合训练只能为1
     if not args.calc_flops and not args.skip_training:
         training_config.data_paths = parse_path_common(paths.train_rgb, paths.train_evs, RC=True)
     training_config.data_index_offset = 0
     training_config.rgb_sampling_ratio = 1
-    training_config.interp_ratio = 16
+    training_config.interp_ratio = 4
     # training_config.sample_group = 3
     training_config.random_t = False
     training_config.color = 'RGB'
@@ -75,7 +75,10 @@ def traintest_RC_smallmix_lpips(args):
     # training_config.lr = 1e-4
     # training_config.optim.scheduler_lr_gamma = 0.5
     # training_config.optim.scheduler_lr_milestone = [25, 50, 75]
-    training_config.max_epoch = 10
+#！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+    # training_config.max_epoch = 15
+    training_config.max_epoch = 25
+#！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
 
     training_config.losses = ED()
     training_config.losses.Charbonier = ED()
@@ -108,8 +111,13 @@ def traintest_RC_smallmix_lpips(args):
         validation_config.data_paths = parse_path_common(paths.test_rgb, paths.test_evs, RC=True)
     validation_config.data_index_offset = 0
     validation_config.rgb_sampling_ratio = 1
-    validation_config.interp_ratio = 16
-    validation_config.real_interp = 16
+    ########################################################
+    # validation_config.interp_ratio = 16
+    # validation_config.real_interp = 16
+    ########################################################
+    validation_config.interp_ratio = 4
+    validation_config.real_interp = 4
+
     validation_config.random_t = False
     validation_config.color = 'RGB'
 
