@@ -1,4 +1,6 @@
-# Event-based Video Frame Interpolation with TimeLens-XL and U-Net Refiner Custom Dataset Support + Refiner Training Pipeline
+# Event-based Video Frame Interpolation with TimeLens-XL and U-Net Refiner 
+
+Custom Dataset Support + Refiner Training Pipeline
 
 This repository extends **TimeLens-XL (ECCV 2024)** with:
 
