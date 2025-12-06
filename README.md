@@ -1,53 +1,177 @@
-# TimeLens-XL: Real-time Event-based Video Frame Interpolation with Large Motion
+# TimeLens-XL: Event-based Video Frame Interpolation  
+Custom Dataset Support + Refiner Training Pipeline
 
-![](docs/static/images/teaser.jpg)
+This repository extends **TimeLens-XL (ECCV 2024)** with:
 
+- Support for our **self-recorded MyData dataset**
+- Full compatibility with the **HQEVFI dataset**
+- Optional **U-Net Refiner module** for improving interpolation quality
+- A structured **freeze–refine–finetune** training workflow
 
-[[Project Page](https://openimaginglab.github.io/TimeLens-XL/)] [[Paper Link]()] [[Dataset]()]
+---
 
-This is the codebase for our paper TimeLens-XL, which has been accepted by ECCV2024. In this paper, we propose a lightweight netowrk for Event-VFI which is able to interpoalte for large motions in realtime at 720p resolution. We provide pretrained weights, code for evaluation for both our TLXNet, TLXNet+, and state-of-the-art methods.
+## 📦 Dataset
 
-Please email Mr. Yongrui Ma (yongrayma@gmail.com) for questions related to this work.
+### **1. MyData (Our Self-recorded Event Camera Dataset)**
 
-## Update History
-Finished:
-* Refresh readme file to fix some existing bugs
+APS RGB frames + Event `.npy` files recorded using a DAVIS-style sensor.
 
-Coming soon:
+👉 **Download (MyData dataset):**  
+https://hkustgz-my.sharepoint.com/:u:/g/personal/hqiang669_connect_hkust-gz_edu_cn/EQytdQ-Rg09Pv0riEXI3vIABFVr8QX5Ib5lLau6oqRd-cw?e=14tgds
 
-* Will release all experimental results and corresponding weights by the end of January;
-* Will release generated synthetic datasets by the beginning of February 2025.
+Place it under:
 
-## Quick Start
-### Environment
-Please download dependency packages by
+```
+mydata/
+   scene1/
+      aps_png/
+      events/
+```
+
+---
+
+### **2. HQEVFI Dataset (Official TimeLens-XL Dataset)**
+
+👉 Download link (Google Drive):  
+https://drive.google.com/file/d/104ZMJ-M_frImOOCGfLk_HDb2FV1trveT/view?usp=drive_link
+
+---
+
+## 🎥 Demo Video
+
+👉 **Demo Video Link:**  
+https://hkustgz-my.sharepoint.com/:f:/g/personal/hqiang669_connect_hkust-gz_edu_cn/Ekw0jvvcFGZAhdTp-j4rR4wB7UnQroevsLyvKcGaCELYBg?e=ZhQh9X
+
+---
+
+## 🧰 Pretrained Weights
+
+### **1. Official TimeLens-XL Pretrained Model (no Refiner)**
+
+Used for:
+
+- Baseline inference on HQEVFI  
+- Frozen-backbone Refiner training  
+
+```
+weights/Expv8_large_HQEVFI.pt
+```
+
+---
+
+# ⚡ Quick Start
+
+## 0. Install environment
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### Dataset
-Download supported datasets and change path files in `params/Paths` accordingly. Currently we support:
-1. Adobe dataset;
-2. GOPRO dataset;
-3. [BSERGB dataset](https://github.com/uzh-rpg/timelens-pp/?tab=readme-ov-file);
-4. HQEVFI dataset [[Google Drive]](https://drive.google.com/file/d/104ZMJ-M_frImOOCGfLk_HDb2FV1trveT/view?usp=drive_link);
+---
 
-Please notice that 1 and 2 are synthetic datasets. We first interpolate Adobe and GOPRO dataset to 1920 FPS (x8) with [RIFE](https://github.com/hzwer/ECCV2022-RIFE), and then synthesis events based on [v2e](https://github.com/SensorsINI/v2e).
+# **1. HQEVFI — Inference using official pretrained model (interp ratio = 4)**
 
-Compared with original v2e, we made several changes on the simulator:
-1. We remove image resize to make the RGB and event stream the same size, as we do not focus only on davis camera with fixed resolution;
-2. We removed the random disturbance on time as we already have temporal dense RGB frames.
+```bash
+python run_network.py   --param_name traintest_RC_smallmix_lpips   --model_name Expv8_large   --model_pretrained weights/Expv8_large_HQEVFI.pt   --skip_training   --extension _pretrained_inference_x4
+```
 
-Please re-generate the synthetic dataset according to v2e simulator or we will release our simulator and synthetic datasets shortly.
+---
 
-### Pretrained weights
-on HQ-EVFI dataset:
-[TLXNet+](https://drive.google.com/file/d/1t0Zd3fNLDSsrsZOy8XNA82-wOhv7Wd7t/view?usp=sharing)
+# **2. HQEVFI — Training using official pretrained model (interp ratio = 4)**
 
-on BSERGB dataset: [TLXNet+ x4 interpolation](https://drive.google.com/file/d/19yaIKsDNpKiDSMA8XARSIovLXvnCEchB/view?usp=sharing)
+Just remove `--skip_training`:
 
-### Evaluation on HQ-EVFI
-python run_network.py --param_name traintest_RC_smallmix_lpips --model_name Expv8_large --model_pretrained ./weights/Expv8_large_HQEVFI.pt --skip_training
+```bash
+python run_network.py   --param_name traintest_RC_smallmix_lpips   --model_name Expv8_large   --model_pretrained weights/Expv8_large_HQEVFI.pt   --extension _pretrained_train_x4
+```
 
-### Training on HQ-EVFI
-Just remove --skip_training of evaluation code. 
+---
+
+# **3. HQEVFI — Freeze Backbone, Train Only the U-Net Refiner**
+
+```bash
+python run_network_refine.py   --param_name traintest_RC_smallmix_lpips   --model_name Expv8_large   --model_pretrained ./weights/Expv8_large_HQEVFI.pt   --extension _unetRefiner
+```
+
+This stage:
+
+- Freezes the TimeLens-XL backbone  
+- Trains only the `unet_refiner.*` parameters  
+
+---
+
+# **4. HQEVFI — After Refiner Training, Finetune the Whole Model**
+
+Replace the pretrained path with the newly produced checkpoint:
+
+```bash
+python run_network_refine.py   --param_name traintest_RC_smallmix_lpips   --model_name Expv8_large   --model_pretrained <path_to_trained_refiner_weight.pt>   --extension _unetRefiner_finetune
+```
+
+---
+
+# **5. Adjusting Training Epochs**
+
+The official pretrained model `Expv8_large_HQEVFI.pt` contains:
+
+```
+epoch = 10
+```
+
+If you want to train **5 more epochs**, set:
+
+File:  
+```
+params/HQEVFI/params_traintest_quick_adam_withlpips_mix.py
+```
+
+Modify:
+
+```python
+training_config.max_epoch = 15  # 10 original + 5 new epochs
+```
+
+---
+
+# **6. Inference on MyData Dataset (interp ratio = 4)**
+
+```bash
+python run_network.py   --param_name MyInferenceDataset   --model_name Expv8_large_infer   --model_pretrained <your_weight_path>   --skip_training   --extension _x4
+```
+
+---
+
+## 📁 Project Structure (Simplified)
+
+```
+my_timelens_project/
+│
+├── dataset/
+├── params/
+│   ├── HQEVFI/
+│   ├── mydata/
+│
+├── weights/
+│     └── Expv8_large_HQEVFI.pt
+│
+├── mydata/     # our custom dataset
+├── run_network.py
+├── run_network_refine.py
+└── generate_video.py
+```
+
+---
+
+## 🙏 Acknowledgements
+
+This project is based on:
+
+**TimeLens-XL (ECCV 2024)**  
+Project page:  
+https://openimaginglab.github.io/TimeLens-XL/
+
+We extend the original framework with:
+
+- MyData dataset support  
+- U-Net Refiner integration  
+- Freeze–Refine–Finetune training pipeline  

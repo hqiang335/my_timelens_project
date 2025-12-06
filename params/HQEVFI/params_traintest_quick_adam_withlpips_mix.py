@@ -46,7 +46,7 @@ def traintest_RC_smallmix_lpips(args):
     # model_config.define_model = cur_model_arch_config
 
     training_config = ED()
-    training_config.dataloader = 'mix_loader_smallRC' #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    training_config.dataloader = 'mix_loader_smallRC' 
     training_config.crop_size = 256
     training_config.num_workers = 8
     training_config.batch_size = 1 #混合训练只能为1
@@ -75,10 +75,8 @@ def traintest_RC_smallmix_lpips(args):
     # training_config.lr = 1e-4
     # training_config.optim.scheduler_lr_gamma = 0.5
     # training_config.optim.scheduler_lr_milestone = [25, 50, 75]
-#！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
     # training_config.max_epoch = 15
     training_config.max_epoch = 25
-#！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
 
     training_config.losses = ED()
     training_config.losses.Charbonier = ED()

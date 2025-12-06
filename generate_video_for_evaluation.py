@@ -2,8 +2,7 @@ import os
 import re
 import cv2
 
-# ========= 路径 & 参数 =========
-# 图片所在目录（你说的那个 10 文件夹）
+# 图片所在目录
 IMG_DIR = "RGB_resOut_HQEVFI/mix_Expv8_largex16_adamLPIPS/Validation_Visual_Examples/images/10"
 
 # 输出视频路径（可以根据需要自己改）
@@ -13,19 +12,11 @@ OUT_RES_MP4 = f"RGB_resOut_HQEVFI/mix_Expv8_largex16_adamLPIPS/Validation_Visual
 
 
 def natural_key(s: str):
-    """
-    自然排序用的 key：把字符串中的数字部分按 int 排序，
-    避免 'img10' 排在 'img2' 前面。
-    """
     return [int(text) if text.isdigit() else text.lower()
             for text in re.split(r'(\d+)', s)]
 
 
 def collect_images(img_dir, suffix):
-    """
-    从 img_dir 收集所有以 suffix 结尾的 jpg，按自然顺序排序。
-    比如 suffix='_gt.jpg' 或 '_res.jpg'
-    """
     files = [
         f for f in os.listdir(img_dir)
         if f.lower().endswith(".jpg") and f.endswith(suffix)
@@ -38,7 +29,6 @@ def make_video(img_dir, filenames, out_path, fps):
     if len(filenames) == 0:
         raise ValueError(f"在 {img_dir} 中没找到任何图片，用于输出 {out_path}")
 
-    # 读取第一张图确定尺寸
     first_path = os.path.join(img_dir, filenames[0])
     first_img = cv2.imread(first_path)
     if first_img is None:
@@ -50,17 +40,16 @@ def make_video(img_dir, filenames, out_path, fps):
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     writer = cv2.VideoWriter(out_path, fourcc, fps, size)
 
-    print(f"✅ 开始合成视频: {out_path}")
+    print(f"开始合成视频: {out_path}")
     print(f"   帧率: {fps}, 分辨率: {w}x{h}, 总帧数: {len(filenames)}")
 
     for i, name in enumerate(filenames):
         img_path = os.path.join(img_dir, name)
         img = cv2.imread(img_path)
         if img is None:
-            print(f"⚠️  跳过无法读取的图片: {img_path}")
+            print(f"跳过无法读取的图片: {img_path}")
             continue
 
-        # 若分辨率不一致，则 resize 到首帧的尺寸
         if img.shape[0] != h or img.shape[1] != w:
             img = cv2.resize(img, size, interpolation=cv2.INTER_AREA)
 
@@ -70,26 +59,24 @@ def make_video(img_dir, filenames, out_path, fps):
             print(f"   已写入帧数: {i + 1}/{len(filenames)}")
 
     writer.release()
-    print(f"🎬 完成输出: {out_path}\n")
+    print(f"完成输出: {out_path}\n")
 
 
 def main():
-    # 1. 收集 GT 和 RES 图片
     gt_imgs  = collect_images(IMG_DIR,  "_gt.jpg")
     res_imgs = collect_images(IMG_DIR, "_res.jpg")
 
     print(f"在 {IMG_DIR} 中找到 {len(gt_imgs)} 张 GT 图片，{len(res_imgs)} 张合成帧图片。")
 
-    # 2. 分别合成两个视频
     if gt_imgs:
         make_video(IMG_DIR, gt_imgs, OUT_GT_MP4, FPS)
     else:
-        print("⚠️ 没找到任何 *_gt.jpg 图片，跳过 GT 视频生成。")
+        print("没找到任何 *_gt.jpg 图片，跳过 GT 视频生成。")
 
     if res_imgs:
         make_video(IMG_DIR, res_imgs, OUT_RES_MP4, FPS)
     else:
-        print("⚠️ 没找到任何 *_res.jpg 图片，跳过合成帧视频生成。")
+        print("没找到任何 *_res.jpg 图片，跳过合成帧视频生成。")
 
 
 if __name__ == "__main__":
